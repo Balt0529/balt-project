@@ -7,7 +7,7 @@ export default function Hello() {
   useEffect(() => {
     async function getMessage() {
       try {
-        const url = "https://next-js-balt-fastapi.vercel.app/";
+        const url = "https://next-js-balt-fastapi.vercel.app";
         const res = await axios.get(url);
         setMessage(res.data.message);
       } catch (err) {
