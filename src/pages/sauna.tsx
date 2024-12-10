@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Container, Center, Flex, Heading, Text, Button, Image, VStack, HStack, SimpleGrid } from '@chakra-ui/react';
+import { Box, Container, Center, Flex, Heading, Text, Button, Image, VStack, SimpleGrid } from '@chakra-ui/react';
 
 const SaunaApp = () => {
   return (
