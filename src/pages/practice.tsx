@@ -1,4 +1,4 @@
-import { Box, Grid, GridItem, Text, Center, Button, HStack, VStack, Link, AbsoluteCenter, Input, Kbd,} from "@chakra-ui/react"
+import { Box, Grid, GridItem, Text, Button, VStack, Link, AbsoluteCenter, Input,} from "@chakra-ui/react"
 import { InputGroup } from "@/components/ui/input-group"
 import { FaSearch } from "react-icons/fa"
 import { keyframes } from "@emotion/react";
