@@ -102,7 +102,7 @@ return (
 
   <Box h={"90vh"} m="4" p="3">
     <Text fontSize="3xl" textDecoration="underline">
-      ’ととのう’とは
+      "ととのう"とは
     </Text>
     <Button onClick={SaunaApp} color='blue'>Sauna</Button>
 
