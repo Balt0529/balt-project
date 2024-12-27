@@ -1,105 +1,100 @@
-import { Box, Text, Button, VStack, HStack, Input } from "@chakra-ui/react";
+import { Box, Grid, GridItem, Text, Button, VStack, Link, AbsoluteCenter, Input, Table, Stack, For } from "@chakra-ui/react"
+import { InputGroup } from "@/components/ui/input-group"
+import { FaSearch } from "react-icons/fa"
+import { keyframes } from "@emotion/react";
 import axios from "axios";
-import { useState, useEffect } from "react";
+import {useState, useEffect} from "react";
+import { GrNewWindow } from "react-icons/gr";
 
-type User = {
-  id: string;
-  email: string;
-  name: string;
-};
+export default function SaunaApp() {
 
-type Post = {
-  id: number;
-  user_id: string;
-  place_id: string;
-  content: string;
-  created_at: string;
-};
+  const[posts,setPosts]=useState<Post[]>([]);
 
-export default function PostApp() {
-  const [posts, setPosts] = useState([]);
-  const [newPlace_id, setNewPlace_id] = useState(""); // 新しいサウナの場所
-  const [newContent, setNewContent] = useState(""); // 新しい感想
+  type Post = {
+    id: number;
+    user_id: number;
+    place_id: string;
+    content: string;
+    created_at: string;
+  };
 
-  // データを取得する関数
+//GET
   async function fetchPosts() {
     try {
-      const res = await axios.get("http://127.0.0.1:8000/posts");
-      setPosts(res.data); // データをステートに保存
+      const url = "http://127.0.0.1:8000/posts";
+      const res = await axios.get(url);
+      setPosts(res.data);
     } catch (err) {
-      console.error("Error fetching posts:", err);
+      console.error(err);
     }
   }
 
-  // 新しいメモを追加する関数
-  const addPost = async () => {
-    try {
-      const newPost = {
-        place_id: newPlace_id,
-        content: newContent,
-      };
-      await axios.post("http://localhost:8000/posts", newPost);
-      setNewPlace_id(""); // 入力欄をリセット
-      setNewContent("");
-      fetchPosts(); // メモ一覧を更新
-    } catch (err) {
-      console.error("メモ追加エラー:", err);
-    }
-  };
+  // //POST  
+  // async function addPost(){
+  //   try{
+  //     const url = "http://127.0.0.1:8000/posts";
+  //     const newPost={id:newID,user_id:newUser_id,place_id:newPlace_id,content:newContent,created_at:newCreated_at};
+  //     await axios.post(url,newPost);
+  //     setNewID("");
+  //     setNewUser_id("");
+  //     setNewPlace_id("");
+  //     setNewContent("");
+  //     setNewCreated_at("");
+      
+  //     HomePage();
+  //   }catch(err){
+  //     console.error(err);
+  //   }
+  // }
 
+  useEffect(()=>{fetchPosts()},[]);
 
-  // 初回レンダリング時にデータを取得
-  useEffect(() => {
-    fetchPosts();
-  }, []);
+return (
+  <>
+  <Box h={"90vh"} m="4" p="3">
+    <Text fontSize="3xl" textDecoration="underline">
+      "ととのう"とは
+    </Text>
+    <Button onClick={SaunaApp} color='blue'>Sauna</Button>
 
-  return (
-    <>
-    <VStack mt={4} align="center">
-      {/* 新しいメモを入力するフォーム */}
-      <HStack>
-        <Input
-          placeholder="場所"
-          value={newPlace_id}
-          onChange={(e) => setNewPlace_id(e.target.value)}
-        />
-        <Input
-          placeholder="内容"
-          value={newContent}
-          onChange={(e) => setNewContent(e.target.value)}
-        />
-        <Button colorScheme="teal" onClick={addPost}>
-          追加
-        </Button>
-      </HStack>
-
-      {/* メモの一覧表示 */}
-      <Box>
-        <table>
+    <Box p={4}>
+      <Text fontSize="2xl" fontWeight="bold" mb={4}>
+        Posts Table
+      </Text>
+      <Box overflowX="auto">
+        <table style={{ width: "100%", borderCollapse: "collapse" }}>
           <thead>
             <tr>
-              <th>ID</th>
-              <th>タイトル</th>
-              <th>内容</th>
-              <th>タグ</th>
-              <th>作成日時</th>
-              <th>操作</th>
+              <th style={{ border: "1px solid black", padding: "8px" }}>ID</th>
+              <th style={{ border: "1px solid black", padding: "8px" }}>User ID</th>
+              <th style={{ border: "1px solid black", padding: "8px" }}>Place ID</th>
+              <th style={{ border: "1px solid black", padding: "8px" }}>Content</th>
+              <th style={{ border: "1px solid black", padding: "8px" }}>Created At</th>
             </tr>
           </thead>
           <tbody>
-            {posts.map((post: any) => (
-              <tr key={post.id}>
-                <td>{post.id}</td>
-                <td>{post.place_id}</td>
-                <td>{post.content}</td>
-                <td>{post.created_at}</td>
+            {posts.length > 0 ? (
+              posts.map((post) => (
+                <tr key={post.id}>
+                  <td style={{ border: "1px solid black", padding: "8px" }}>{post.id}</td>
+                  <td style={{ border: "1px solid black", padding: "8px" }}>{post.user_id}</td>
+                  <td style={{ border: "1px solid black", padding: "8px" }}>{post.place_id}</td>
+                  <td style={{ border: "1px solid black", padding: "8px" }}>{post.content}</td>
+                  <td style={{ border: "1px solid black", padding: "8px" }}>{post.created_at}</td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={5} style={{ textAlign: "center", padding: "8px" }}>
+                  No posts available
+                </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
       </Box>
-      </VStack>
-    </>
-    
-  );
+    </Box>
+  </Box>
+  </>
+)
 }
