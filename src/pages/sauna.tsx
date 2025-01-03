@@ -2,14 +2,11 @@ import React, { useState } from "react";
 import {
   Box,
   Button,
-  Input,
-  SimpleGrid,
   Text,
-  AbsoluteCenter,
-  Spinner,
-} from "@chakra-ui/react"; // Chakra UI v3.0.0対応
-import { Checkbox } from "@/components/ui/checkbox";
-import { FaSearch } from "react-icons/fa";
+  SimpleGrid,
+  Input,
+} from "@chakra-ui/react";
+import { Checkbox } from "@/components/ui/checkbox"
 import { useRouter } from "next/router";
 
 const SearchForm = () => {
@@ -20,18 +17,39 @@ const SearchForm = () => {
   const [loading, setLoading] = useState(false); // ローディング状態
   const router = useRouter();
 
-  // 都道府県一覧
-  const prefectures = [
-    "北海道", "青森県", "岩手県", "宮城県", "秋田県", "山形県", "福島県",
-    "茨城県", "栃木県", "群馬県", "埼玉県", "千葉県", "東京都", "神奈川県",
-    "新潟県", "富山県", "石川県", "福井県", "山梨県", "長野県", "岐阜県",
-    "静岡県", "愛知県", "三重県", "滋賀県", "京都府", "大阪府", "兵庫県",
-    "奈良県", "和歌山県", "鳥取県", "島根県", "岡山県", "広島県", "山口県",
-    "徳島県", "香川県", "愛媛県", "高知県", "福岡県", "佐賀県", "長崎県",
-    "熊本県", "大分県", "宮崎県", "鹿児島県", "沖縄県"
+  // 地域ごとの都道府県データ
+  const regions = [
+    {
+      name: "北海道・東北",
+      prefectures: ["北海道", "青森県", "岩手県", "宮城県", "秋田県", "山形県", "福島県"],
+    },
+    {
+      name: "関東",
+      prefectures: ["茨城県", "栃木県", "群馬県", "埼玉県", "千葉県", "東京都", "神奈川県"],
+    },
+    {
+      name: "北陸・甲信越",
+      prefectures: ["新潟県", "富山県", "石川県", "福井県", "山梨県", "長野県"],
+    },
+    {
+      name: "東海",
+      prefectures: ["岐阜県", "静岡県", "愛知県", "三重県"],
+    },
+    {
+      name: "近畿",
+      prefectures: ["滋賀県", "京都府", "大阪府", "兵庫県", "奈良県", "和歌山県"],
+    },
+    {
+      name: "中国・四国",
+      prefectures: ["鳥取県", "島根県", "岡山県", "広島県", "山口県", "徳島県", "香川県", "愛媛県", "高知県"],
+    },
+    {
+      name: "九州・沖縄",
+      prefectures: ["福岡県", "佐賀県", "長崎県", "熊本県", "大分県", "宮崎県", "鹿児島県", "沖縄県"],
+    },
   ];
 
-  // チェックボックスの変更処理
+  // チェックボックス変更処理
   const handleCheckboxChange = (prefecture: string) => {
     setSelectedAreas((prev) =>
       prev.includes(prefecture)
@@ -45,23 +63,32 @@ const SearchForm = () => {
     setLoading(true);
     try {
       const queryParams: Record<string, string> = {};
-  
-      if (activeTab === "keyword" && keyword) {
-        queryParams.keyword = keyword;
-      } else if (activeTab === "area" && selectedAreas.length > 0) {
-        queryParams.prefecture = selectedAreas.join(","); // カンマ区切りで結合
+
+      // タブがキーワード検索の場合
+      if (activeTab === "keyword" && keyword.trim() !== "") {
+        queryParams.keyword = keyword; // キーワードを追加
       }
-  
+      // タブが都道府県検索の場合
+      else if (activeTab === "area" && selectedAreas.length > 0) {
+        queryParams.prefecture = selectedAreas.join(","); // カンマ区切りで都道府県を追加
+      }
+
+      // クエリパラメータが空の場合は検索を行わない
+      if (Object.keys(queryParams).length === 0) {
+        console.error("検索条件が指定されていません。");
+        setLoading(false);
+        return;
+      }
+
       const queryString = new URLSearchParams(queryParams).toString();
-      router.push(`/sauna-map?${queryString}`);
+      console.log(`Generated Query String: ${queryString}`); // 確認用ログ
+      router.push(`/saunaresult?${queryString}`);
     } catch (error) {
       console.error("検索に失敗しました:", error);
     } finally {
       setLoading(false);
     }
   };
-  
-  
 
   return (
     <Box p={4} bg="white" boxShadow="md" borderRadius="md" width="100%" maxWidth="600px" mx="auto">
@@ -129,21 +156,28 @@ const SearchForm = () => {
           alignItems="center"
           zIndex="1000"
         >
-          <Box bg="white" p={6} borderRadius="md" width="90%" maxWidth="500px">
+          <Box bg="white" p={6} borderRadius="md" width="95%" maxWidth="800px" maxHeight="80vh" overflowY="auto">
             <Text fontSize="lg" fontWeight="bold" mb={4}>
               エリア絞り込み
             </Text>
-            <SimpleGrid columns={3}>
-              {prefectures.map((prefecture) => (
-                <Checkbox
-                  key={prefecture}
-                  checked={selectedAreas.includes(prefecture)}
-                  onChange={() => handleCheckboxChange(prefecture)}
-                >
-                  {prefecture}
-                </Checkbox>
-              ))}
-            </SimpleGrid>
+            {regions.map((region) => (
+              <Box key={region.name} mb={4}>
+                <Text fontWeight="bold" mb={2}>
+                  {region.name}
+                </Text>
+                <SimpleGrid columns={6}>
+                  {region.prefectures.map((prefecture) => (
+                    <Checkbox
+                      key={prefecture}
+                      checked={selectedAreas.includes(prefecture)}
+                      onChange={() => handleCheckboxChange(prefecture)}
+                    >
+                      {prefecture}
+                    </Checkbox>
+                  ))}
+                </SimpleGrid>
+              </Box>
+            ))}
             <Button mt={4} colorScheme="blue" width="100%" onClick={() => setModalOpen(false)}>
               このエリアで絞り込む
             </Button>
