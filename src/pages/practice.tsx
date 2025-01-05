@@ -130,14 +130,72 @@ export default function SaunaApp() {
       </Box>
 
       <Box h="100vh" id="box1" bgImage="url('/Images/image.jpg')" bgSize="cover" display="flex" alignItems="center" justifyContent="center" textAlign="center" p={4}>
-        <VStack>
-          <Heading size="4xl" color="white" textShadow="0px 4px 8px rgba(0, 0, 0, 0.8)">
+      <VStack>
+          <Heading size="2xl" color="white" textShadow="0px 4px 8px rgba(0, 0, 0, 0.8)">
             "ととのう"とは
           </Heading>
-          <Text fontSize="lg" color="gray.500" maxW="600px">
+          <Text fontSize="lg" color="black" maxW="600px">
             サウナで心と体がリフレッシュし、最高のリラクゼーション状態に達する瞬間。それが「ととのう」体験です。
           </Text>
         </VStack>
+      </Box>
+
+      {/* サウナの基本サイクル */}
+      <Box py={16}>
+        <Heading size="lg" mb={8} textAlign="center">
+          サウナの基本サイクル
+        </Heading>
+        <SimpleGrid columns={{ base: 1, md: 3 }} px={4} bg="pink.50">
+  <Box textAlign="center" bg="white" p={6} shadow="md" borderRadius="md" mr={4}>
+    <Image
+      src="/Images/温め.jpeg"
+      alt="サウナで温める"
+      mb={4}
+      boxSize="150px" // 画像サイズを統一
+      objectFit="cover" // 画像の比率を保ちながら枠に収める
+      mx="auto" // 左右中央揃え
+    />
+    <Heading size="md">1. 温める</Heading>
+    <Text mt={2}>サウナで体を温め、じっくり汗を流します。</Text>
+  </Box>
+
+  <Box textAlign="center" bg="white" p={6} shadow="md" borderRadius="md" mr={4}>
+    <Image
+      src="/Images/水風呂.jpg"
+      alt="水風呂で冷やす"
+      mb={4}
+      boxSize="150px"
+      objectFit="cover"
+      mx="auto"
+    />
+    <Heading size="md">2. 冷やす</Heading>
+    <Text mt={2}>水風呂に入って、体を一気に冷却します。</Text>
+  </Box>
+
+  <Box textAlign="center" bg="white" p={6} shadow="md" borderRadius="md">
+    <Image
+      src="/Images/外気浴.png"
+      alt="休憩する"
+      mb={4}
+      boxSize="150px"
+      objectFit="cover"
+      mx="auto"
+    />
+    <Heading size="md">3. 休む</Heading>
+    <Text mt={2}>外気浴やリクライニングで体をリラックスさせます。</Text>
+  </Box>
+</SimpleGrid>
+      </Box>
+
+      {/* ととのいの感覚 */}
+      <Box bg="blue.50" py={16}>
+        <Heading size="lg" mb={6} textAlign="center">
+          「ととのう」とは？
+        </Heading>
+        <Text fontSize="lg" px={4} maxW="800px" mx="auto" textAlign="center">
+          サウナと水風呂、外気浴を繰り返すことで、エンドルフィンやセロトニン、オキシトシンなどの"脳内麻薬"が分泌され、全身がリフレッシュされる感覚。
+          頭がスーッと軽くなり、心も体も解放される瞬間です。
+        </Text>
       </Box>
 
       <Box id="box2" bg="green.100" p={8} minH="100vh">

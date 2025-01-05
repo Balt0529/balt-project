@@ -44,18 +44,28 @@
 
 //   return (
 //     <Box p={4}>
-//       {sauna ? (
-//         <>
-//           <Text fontSize="2xl" fontWeight="bold">{sauna.name}</Text>
-//           <Text>住所: {sauna.address}</Text>
-//           <Text>評価: {sauna.rating || "評価なし"}</Text>
-//           {sauna.photos && sauna.photos.length > 0 && (
+//   {sauna ? (
+//     <>
+//       <Text fontSize="2xl" fontWeight="bold">{sauna.name}</Text>
+//       <Text>住所: {sauna.address}</Text>
+//       <Text>評価: {sauna.rating || "評価なし"}</Text>
+//       {sauna.photos && sauna.photos.length > 0 ? (
+//         <Box display="flex" flexWrap="wrap" gap={4} mt={4}>
+//           {sauna.photos.map((photo: any, index: number) => (
 //             <Image
-//               src={`https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${sauna.photos[0].photo_reference}&key=${googleMapsApiKey}`}
-//               alt={sauna.name}
-//               mt={4}
+//               key={index}
+//               src={`https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${photo.photo_reference}&key=${googleMapsApiKey}`}
+//               alt={`${sauna.name}の写真${index + 1}`}
+//               borderRadius="md"
+//               width="200px"
+//               height="150px"
+//               objectFit="cover"
 //             />
-//           )}
+//           ))}
+//         </Box>
+//       ) : (
+//         <Text mt={4}>画像がありません。</Text>
+//       )}
 //         </>
 //       ) : (
 //         <Text>サウナの情報が見つかりません。</Text>
@@ -66,6 +76,7 @@
 
 // export default SaunaDetail;
 
+
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import {
@@ -73,25 +84,46 @@ import {
   Spinner,
   Text,
   Image,
-  VStack,
-  Input,
+  Textarea,
   Button,
-  Table,
+  Toast,
 } from "@chakra-ui/react";
-import axios from "axios";
+import supabase from "@/libs/supabase";
 
 const SaunaDetail: React.FC = () => {
   const router = useRouter();
-  const { saunaID } = router.query; // place_id を取得
+  const { saunaID } = router.query; // Google Placesのplace_id
   const [sauna, setSauna] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [posts, setPosts] = useState<any[]>([]);
-  const [content, setContent] = useState<string>("");
+  const [content, setContent] = useState<string>(""); // 投稿内容
+  const [userID, setUserID] = useState<string | null>(null); // Google認証のユーザーID
   const googleMapsApiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
-  const userID = "test_user_id"; // Google 認証から得たユーザーID（ここを置き換える）
 
-  // サウナの詳細を取得
+  // Google認証情報を取得
+  useEffect(() => {
+    const fetchUserID = async () => {
+      const {
+        data: { session },
+        error,
+      } = await supabase.auth.getSession();
+
+      if (error) {
+        console.error("セッション取得エラー:", error);
+        return;
+      }
+
+      if (session?.user) {
+        setUserID(session.user.id); // Google認証で取得したユーザーID
+      } else {
+        console.warn("ユーザー情報が見つかりません");
+      }
+    };
+
+    fetchUserID();
+  }, []);
+
+  // サウナの詳細情報を取得
   useEffect(() => {
     if (!saunaID) return;
 
@@ -116,54 +148,39 @@ const SaunaDetail: React.FC = () => {
     fetchSaunaDetail();
   }, [saunaID]);
 
-  // 投稿一覧を取得
-  useEffect(() => {
-    if (!saunaID) return;
+   // Toastメッセージを代替
+   const showToast = (title: string, description?: string, status?: string) => {
+    alert(`${title}: ${description || ""}`);
+  };
 
-    const fetchPosts = async () => {
-      try {
-        const response = await axios.get(
-          `http://127.0.0.1:8000/posts?sauna_id=${saunaID}`
-        );
-        setPosts(response.data);
-      } catch (err) {
-        console.error("Failed to fetch posts:", err);
-      }
-    };
-
-    fetchPosts();
-  }, [saunaID]);
-
-  // 投稿を追加
-  const addPost = async () => {
+  const handlePost = async () => {
     if (!content.trim()) {
-      alert("投稿内容を入力してください。");
+      showToast("投稿内容が空です", "入力してください", "warning");
       return;
     }
 
     try {
-      const newPost = {
-        user_id: userID,
-        sauna_id: saunaID,
-        content,
-      };
-
-      await axios.post("http://127.0.0.1:8000/posts", newPost);
-
-      // 投稿一覧を更新
-      setPosts((prevPosts) => [
-        {
-          ...newPost,
-          created_at: new Date().toISOString(),
-          id: Math.random(), // 仮のID（サーバーからの応答で取得することを推奨）
+      // 投稿処理
+      const response = await fetch("http://127.0.0.1:8000/posts", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-        ...prevPosts,
-      ]);
+        body: JSON.stringify({
+          user_id: "example_user_id",
+          sauna_id: saunaID,
+          content,
+        }),
+      });
 
-      setContent(""); // 入力欄をリセット
+      if (!response.ok) {
+        throw new Error(`投稿に失敗しました: ${response.status}`);
+      }
+
+      showToast("投稿成功", "投稿が完了しました", "success");
+      setContent("");
     } catch (err) {
-      console.error("Failed to add post:", err);
-      alert("投稿に失敗しました。");
+      showToast("投稿失敗", (err as Error).message, "error");
     }
   };
 
@@ -179,55 +196,49 @@ const SaunaDetail: React.FC = () => {
     <Box p={4}>
       {sauna ? (
         <>
-          <Text fontSize="2xl" fontWeight="bold">{sauna.name}</Text>
+          <Text fontSize="2xl" fontWeight="bold">
+            {sauna.name}
+          </Text>
           <Text>住所: {sauna.address}</Text>
           <Text>評価: {sauna.rating || "評価なし"}</Text>
-          {sauna.photos && sauna.photos.length > 0 && (
-            <Image
-              src={`https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${sauna.photos[0].photo_reference}&key=${googleMapsApiKey}`}
-              alt={sauna.name}
-              mt={4}
-            />
+          {sauna.photos && sauna.photos.length > 0 ? (
+            <Box display="flex" flexWrap="wrap" gap={4} mt={4}>
+              {sauna.photos.map((photo: any, index: number) => (
+                <Image
+                  key={index}
+                  src={`https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${photo.photo_reference}&key=${googleMapsApiKey}`}
+                  alt={`${sauna.name}の写真${index + 1}`}
+                  borderRadius="md"
+                  width="200px"
+                  height="150px"
+                  objectFit="cover"
+                />
+              ))}
+            </Box>
+          ) : (
+            <Text mt={4}>画像がありません。</Text>
           )}
 
           {/* 投稿フォーム */}
-          <Box mt={8}>
-            <Text fontSize="xl" fontWeight="bold" mb={4}>
-              投稿を追加
+          <Box mt={6}>
+            <Text fontSize="lg" fontWeight="bold">
+              投稿フォーム
             </Text>
-            <VStack>
-              <Input
-                placeholder="投稿内容を入力してください"
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
-              />
-              <Button onClick={addPost} colorScheme="teal">
-                投稿
-              </Button>
-            </VStack>
-          </Box>
-
-          {/* 投稿一覧 */}
-          <Box mt={8}>
-            <Text fontSize="xl" fontWeight="bold" mb={4}>
-              投稿一覧
-            </Text>
-            <table>
-              <thead>
-                <tr>
-                  <th>作成日時</th>
-                  <th>投稿内容</th>
-                </tr>
-              </thead>
-              <tbody>
-                {posts.map((post) => (
-                  <tr key={post.id}>
-                    <td>{new Date(post.created_at).toLocaleString()}</td>
-                    <td>{post.content}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <Textarea
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              placeholder="サウナでの体験を投稿してください！"
+              mt={2}
+              resize="none"
+            />
+            <Button
+              colorScheme="teal"
+              mt={2}
+              onClick={handlePost}
+              disabled={!userID || !saunaID}
+            >
+              投稿する
+            </Button>
           </Box>
         </>
       ) : (
@@ -238,4 +249,3 @@ const SaunaDetail: React.FC = () => {
 };
 
 export default SaunaDetail;
-
