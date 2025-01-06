@@ -5,8 +5,9 @@ import {
   Text,
   SimpleGrid,
   Input,
+  Spinner,
 } from "@chakra-ui/react";
-import { Checkbox } from "@/components/ui/checkbox"
+import { Checkbox } from "@/components/ui/checkbox";
 import { useRouter } from "next/router";
 
 const SearchForm = () => {
@@ -60,7 +61,7 @@ const SearchForm = () => {
 
   // 検索処理
   const handleSearch = async () => {
-    setLoading(true);
+    setLoading(true); // ローディング開始
     try {
       const queryParams: Record<string, string> = {};
 
@@ -82,16 +83,38 @@ const SearchForm = () => {
 
       const queryString = new URLSearchParams(queryParams).toString();
       console.log(`Generated Query String: ${queryString}`); // 確認用ログ
+      await new Promise((resolve) => setTimeout(resolve, 1000)); // 模擬的な遅延
       router.push(`/saunaresult?${queryString}`);
     } catch (error) {
       console.error("検索に失敗しました:", error);
     } finally {
-      setLoading(false);
+      setLoading(false); // ローディング終了
     }
   };
 
   return (
     <Box p={4} bg="white" boxShadow="md" borderRadius="md" width="100%" maxWidth="600px" mx="auto">
+      {/* ローディング表示 */}
+      {loading && (
+        <Box
+          position="fixed"
+          top="0"
+          left="0"
+          width="100vw"
+          height="100vh"
+          bg="rgba(0, 0, 0, 0.5)"
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          zIndex="1000"
+        >
+          <Spinner size="xl" color="white" />
+          <Text color="white" mt={4}>
+            検索中です。少々お待ちください...
+          </Text>
+        </Box>
+      )}
+
       {/* タブ切り替え */}
       <Box display="flex" mb={4}>
         <Button

@@ -23,32 +23,30 @@ export const SessionProvider = ({ children }: SessionProviderProps) => {
         error,
       } = await supabase.auth.getSession();
       if (error) {
-        console.error(error);
+        console.error("セッション取得エラー:", error);
         setIsReady(false);
         return;
       }
+      console.log("SessionProvider のセッション情報:", session); // セッション情報をログに出力
       setSession(session);
       if (session) {
         if (pathname === "/") {
-          router.replace("/practice");
-          return;
+          router.replace("/mypage"); // ログイン済みの場合のリダイレクト
         }
         setIsReady(true);
         return;
       }
       if (pathname !== "/") {
-        router.replace("/");
-        return;
+        router.replace("/"); // 未ログイン時はログインページにリダイレクト
       }
       setIsReady(true);
-      return;
     };
 
     sessionUpdate();
   }, [router, pathname, setIsReady, setSession]);
 
   if (!isReady) {
-    return <></>;
+    return null; // セッション準備ができるまで空のコンポーネントを表示
   }
   return <>{children}</>;
 };
