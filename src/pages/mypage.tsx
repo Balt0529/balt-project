@@ -199,6 +199,25 @@ export default function SaunaApp() {
   }, [router]);
 
 
+  const handleDeleteFavorite = async (favoriteId: number) => {
+    try {
+      const response = await fetch(`http://127.0.0.1:8000/favorites/${favoriteId}`, {
+        method: "DELETE",
+      });
+  
+      if (!response.ok) {
+        throw new Error(`お気に入り削除に失敗しました: ${response.status}`);
+      }
+  
+      // フロントエンドでお気に入りリストを更新
+      setFavorites((prev) => prev.filter((favorite) => favorite.id !== favoriteId));
+      alert("お気に入りを削除しました！");
+    } catch (error) {
+      console.error("お気に入り削除エラー:", error);
+      alert("お気に入りの削除に失敗しました。");
+    }
+  };
+
 
   if (loading) {
     return (
@@ -407,6 +426,14 @@ export default function SaunaApp() {
             {saunaNames[favorite.sauna_id] || "読み込み中..."}
           </Text>
           <Text color="gray.600">ID: {favorite.sauna_id}</Text>
+          <Button
+            mt={4}
+            colorScheme="red"
+            size="sm"
+            onClick={() => handleDeleteFavorite(favorite.id)}
+          >
+            削除
+          </Button>
         </Box>
       ))}
     </SimpleGrid>
