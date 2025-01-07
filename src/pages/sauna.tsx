@@ -6,6 +6,7 @@ import {
   SimpleGrid,
   Input,
   Spinner,
+  Heading,
 } from "@chakra-ui/react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useRouter } from "next/router";
@@ -82,9 +83,9 @@ const SearchForm = () => {
       }
 
       const queryString = new URLSearchParams(queryParams).toString();
-      console.log(`Generated Query String: ${queryString}`); // 確認用ログ
+      console.log("Generated Query String: ${queryString}"); // 確認用ログ
       await new Promise((resolve) => setTimeout(resolve, 1000)); // 模擬的な遅延
-      router.push(`/saunaresult?${queryString}`);
+      router.push("/saunaresult?${queryString}");
     } catch (error) {
       console.error("検索に失敗しました:", error);
     } finally {
@@ -93,7 +94,25 @@ const SearchForm = () => {
   };
 
   return (
-    <Box p={4} bg="white" boxShadow="md" borderRadius="md" width="100%" maxWidth="600px" mx="auto">
+    <Box
+    display="flex"
+    justifyContent="center"
+    alignItems="center"
+    height="100vh" // 画面全体の高さを確保
+    bgImage="url('/Images/monstersauna.webp')" // 背景画像を設定
+    bgSize="cover" // 画像を全体に広げる
+    bgRepeat="no-repeat" // 背景画像を繰り返さない
+  >
+  <Box
+    p={16}
+    bg="rgba(255, 255, 255, 0.6)" // 半透明の白
+    boxShadow="lg"
+    borderRadius="lg"
+    width="90%"
+    maxWidth="800px"
+    minWidth="400px"
+    mx="auto"
+  >
       {/* ローディング表示 */}
       {loading && (
         <Box
@@ -114,20 +133,31 @@ const SearchForm = () => {
           </Text>
         </Box>
       )}
+      {/* タイトル追加 */}
+      <Heading as="h2" size="5xl" mb={6} textAlign="center" color="black">
+          サウナ検索
+        </Heading>
 
       {/* タブ切り替え */}
       <Box display="flex" mb={4}>
         <Button
           flex="1"
+          bg="blue"
+          border="2px solid white"
           colorScheme={activeTab === "keyword" ? "blue" : "gray"}
           onClick={() => setActiveTab("keyword")}
+          _hover={{ bg: 'white' , color: 'blue', border: "2px solid blue"}} // ホバー時の背景色
+          mr={2}
         >
           キーワードから探す
         </Button>
         <Button
           flex="1"
+          bg="blue"
+          border="2px solid white"
           colorScheme={activeTab === "area" ? "blue" : "gray"}
           onClick={() => setActiveTab("area")}
+          _hover={{ bg: 'white' , color: 'blue', border: "2px solid blue" }}
         >
           都道府県から探す
         </Button>
@@ -138,12 +168,14 @@ const SearchForm = () => {
         <Box>
           <Input
             placeholder="施設名・エリア・キーワード"
+            border="1px solid black"
             size="md"
             mb={2}
             value={keyword}
             onChange={(e) => setKeyword(e.target.value)}
+            _hover={{ bg: 'gray.200' }} // ホバー時の背景色
           />
-          <Button colorScheme="red" width="100%" onClick={handleSearch}>
+          <Button color="white" bg="red" width="100%" _hover={{ bg: 'white' , color: 'red', border: "2px solid red" }} onClick={handleSearch}>
             検 索
           </Button>
         </Box>
@@ -151,7 +183,7 @@ const SearchForm = () => {
 
       {activeTab === "area" && (
         <Box>
-          <Button colorScheme="blue" width="100%" onClick={() => setModalOpen(true)}>
+          <Button bg="blue" color="white" width="100%" border="2px solid white" _hover={{ bg: 'white' , color: 'blue', border: "2px solid blue" }} onClick={() => setModalOpen(true)}>
             エリアを選択する
           </Button>
           {selectedAreas.length > 0 && (
@@ -159,54 +191,72 @@ const SearchForm = () => {
               選択されたエリア: {selectedAreas.join(", ")}
             </Box>
           )}
-          <Button mt={4} colorScheme="red" width="100%" onClick={handleSearch}>
+          <Button mt={4} bg="red" color="white" _hover={{ bg: 'white' , color: 'red', border: "2px solid red" }} width="100%" onClick={handleSearch}>
             検 索
           </Button>
         </Box>
       )}
-
+      
       {/* モーダル風UI */}
-      {isModalOpen && (
-        <Box
-          position="fixed"
-          top="0"
-          left="0"
-          width="100vw"
-          height="100vh"
-          bg="rgba(0, 0, 0, 0.5)"
-          display="flex"
-          justifyContent="center"
-          alignItems="center"
-          zIndex="1000"
-        >
-          <Box bg="white" p={6} borderRadius="md" width="95%" maxWidth="800px" maxHeight="80vh" overflowY="auto">
-            <Text fontSize="lg" fontWeight="bold" mb={4}>
-              エリア絞り込み
-            </Text>
-            {regions.map((region) => (
-              <Box key={region.name} mb={4}>
-                <Text fontWeight="bold" mb={2}>
-                  {region.name}
-                </Text>
-                <SimpleGrid columns={6}>
-                  {region.prefectures.map((prefecture) => (
-                    <Checkbox
-                      key={prefecture}
-                      checked={selectedAreas.includes(prefecture)}
-                      onChange={() => handleCheckboxChange(prefecture)}
-                    >
-                      {prefecture}
-                    </Checkbox>
-                  ))}
-                </SimpleGrid>
-              </Box>
+{isModalOpen && (
+  <Box
+    position="fixed"
+    top="0"
+    left="0"
+    width="100vw"
+    height="100vh"
+    bg="rgba(0, 0, 0, 0.5)" // 背景の半透明
+    display="flex"
+    justifyContent="center"
+    alignItems="center"
+    zIndex="1000"
+  >
+    <Box
+      bg="white"
+      p={6}
+      borderRadius="md"
+      width="95%"
+      maxWidth="800px"
+      maxHeight="80vh"
+      overflowY="auto"
+      boxShadow="lg" // 影を追加して立体感を出す
+      position="relative" // 相対位置で要素を制御
+    >
+      <Text fontSize="lg" fontWeight="bold" mb={4}>
+        エリア絞り込み
+      </Text>
+      {regions.map((region) => (
+        <Box key={region.name} mb={4}>
+          <Text fontWeight="bold" mb={2}>
+            {region.name}
+          </Text>
+          <SimpleGrid columns={6}>
+            {region.prefectures.map((prefecture) => (
+              <Checkbox
+                key={prefecture}
+                checked={selectedAreas.includes(prefecture)}
+                onChange={() => handleCheckboxChange(prefecture)}
+              >
+                {prefecture}
+              </Checkbox>
             ))}
-            <Button mt={4} colorScheme="blue" width="100%" onClick={() => setModalOpen(false)}>
-              このエリアで絞り込む
-            </Button>
-          </Box>
+          </SimpleGrid>
         </Box>
-      )}
+      ))}
+      <Button
+        mt={4}
+        bg="blue"
+        _hover={{ bg: "white", color: "blue", border: "2px solid blue" }}
+        width="100%"
+        onClick={() => setModalOpen(false)}
+      >
+        このエリアで絞り込む
+      </Button>
+    </Box>
+  </Box>
+)}
+
+    </Box>
     </Box>
   );
 };
