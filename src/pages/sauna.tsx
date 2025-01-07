@@ -82,9 +82,11 @@ const SearchForm = () => {
         return;
       }
 
-      console.log("Generated Query String: ${queryString}"); // 確認用ログ
+      // クエリ文字列を生成
+    const queryString = new URLSearchParams(queryParams).toString();
+    console.log("Generated Query String:", queryString);
       await new Promise((resolve) => setTimeout(resolve, 1000)); // 模擬的な遅延
-      router.push("/saunaresult?${queryString}");
+      router.push(`/saunaresult?${queryString}`);
     } catch (error) {
       console.error("検索に失敗しました:", error);
     } finally {

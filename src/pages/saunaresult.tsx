@@ -19,7 +19,6 @@ const SaunaResult: React.FC = () => {
 
   useEffect(() => {
     if (!router.isReady) return;
-    console.log(`Received query params:`, { keyword, prefecture });
 
     const fetchResults = async () => {
       setLoading(true);
@@ -39,13 +38,7 @@ const SaunaResult: React.FC = () => {
 
         const data: Sauna[] = await response.json(); // 取得データを型付け
 
-        console.log("Fetched data:", data);
-
-        if (Array.isArray(data)) {
           setResults(data.sort((a, b) => (b.rating || 0) - (a.rating || 0)));
-        } else {
-          setErrorMessage("予期しないエラーが発生しました。");
-        }
       } catch (error) {
         console.error("検索に失敗しました:", error);
         setErrorMessage("サウナの情報を取得できませんでした。");
