@@ -11,7 +11,6 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import supabase from "@/libs/supabase";
-import { CheckIcon } from '@chakra-ui/icons';
 
 // サウナの型定義
 type Sauna = {
@@ -236,7 +235,6 @@ const SaunaDetail: React.FC = () => {
   _hover={{ bg: 'blue.100' }} // ホバー時の背景色
   _disabled={{ opacity: 0.6, cursor: 'not-allowed' }} // 無効化時のスタイル
 >
-  <CheckIcon mr={2} /> {/* チェックマークアイコン */}
   お気に入りに追加
 </Button>
             </Box>
