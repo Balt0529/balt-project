@@ -82,7 +82,6 @@ const SearchForm = () => {
         return;
       }
 
-      const queryString = new URLSearchParams(queryParams).toString();
       console.log("Generated Query String: ${queryString}"); // 確認用ログ
       await new Promise((resolve) => setTimeout(resolve, 1000)); // 模擬的な遅延
       router.push("/saunaresult?${queryString}");
