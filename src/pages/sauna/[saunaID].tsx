@@ -11,6 +11,7 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import supabase from "@/libs/supabase";
+import { CheckIcon } from '@chakra-ui/icons';
 
 // サウナの型定義
 type Sauna = {
@@ -40,6 +41,8 @@ const SaunaDetail: React.FC = () => {
   const [posts, setPosts] = useState<Post[]>([]);
   const googleMapsApiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
   const mapRef = useRef<HTMLDivElement>(null);
+
+  
 
   useEffect(() => {
     const fetchUserID = async () => {
@@ -93,6 +96,9 @@ const SaunaDetail: React.FC = () => {
   };
 
 
+  
+
+
   useEffect(() => {
     if (!saunaID) return;
 
@@ -142,7 +148,7 @@ const SaunaDetail: React.FC = () => {
     if (sauna && sauna.latitude && sauna.longitude && mapRef.current) {
       const map = new google.maps.Map(mapRef.current, {
         center: { lat: parseFloat(sauna.latitude), lng: parseFloat(sauna.longitude) },
-        zoom: 14,
+        zoom: 17,
       });
 
       new google.maps.Marker({
@@ -210,19 +216,29 @@ const SaunaDetail: React.FC = () => {
   }
 
   return (
-    <Box p={4}>
+    <Box p={10}>
       {sauna ? (
         <>
           <Flex align="flex-start" gap={8}>
             <Box flex="1">
-              <Text fontSize="2xl" fontWeight="bold">
+              <Text fontSize="2xl" fontWeight="bold" mb={4}>
                 {sauna.name}
               </Text>
-              <Text>住所: {sauna.address}</Text>
-              <Text>評価: {sauna.rating || "評価なし"}</Text>
-              <Button colorScheme="teal" onClick={handleAddFavorite} disabled={!userID || !saunaID}>
-      お気に入りに追加
-    </Button>
+              <Text mb={2}>住所: {sauna.address}</Text>
+              <Text mb={8}>評価: {sauna.rating || "評価なし"}</Text>
+              <Button
+  color="blue"
+  bg="white"
+  border="2px solid blue" // 外枠を青色に設定
+  borderRadius="md" // ボタンの角を丸める
+  onClick={handleAddFavorite}
+  disabled={!userID || !saunaID}
+  _hover={{ bg: 'blue.100' }} // ホバー時の背景色
+  _disabled={{ opacity: 0.6, cursor: 'not-allowed' }} // 無効化時のスタイル
+>
+  <CheckIcon mr={2} /> {/* チェックマークアイコン */}
+  お気に入りに追加
+</Button>
             </Box>
             <Box
               ref={mapRef}
