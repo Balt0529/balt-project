@@ -2,11 +2,19 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { Box, Spinner, Text, SimpleGrid } from "@chakra-ui/react";
 
+// サウナの型定義
+type Sauna = {
+  id: string;
+  name: string;
+  address: string;
+  rating?: number; // 評価がない場合もあるのでオプショナル
+};
+
 const SaunaResult: React.FC = () => {
   const router = useRouter();
   const { keyword, prefecture } = router.query; // クエリパラメータを取得
   const [loading, setLoading] = useState(false);
-  const [results, setResults] = useState<any[]>([]);
+  const [results, setResults] = useState<Sauna[]>([]);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
@@ -29,13 +37,14 @@ const SaunaResult: React.FC = () => {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
 
-        const data = await response.json();
+        const data: Sauna[] = await response.json(); // 取得データを型付け
+
         console.log("Fetched data:", data);
 
         if (Array.isArray(data)) {
-          setResults(data.sort((a: any, b: any) => (b.rating || 0) - (a.rating || 0)));
+          setResults(data.sort((a, b) => (b.rating || 0) - (a.rating || 0)));
         } else {
-          setErrorMessage(data.message || "予期しないエラーが発生しました。");
+          setErrorMessage("予期しないエラーが発生しました。");
         }
       } catch (error) {
         console.error("検索に失敗しました:", error);

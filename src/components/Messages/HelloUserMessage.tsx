@@ -2,6 +2,7 @@ import { Heading } from "@chakra-ui/react";
 import { Session } from "@supabase/supabase-js";
 import { useRecoilState } from "recoil";
 import { sessionState } from "@/libs/states";
+import Image from "next/image";
 
 export function HelloUserMessage() {
   const [session] = useRecoilState<Session | null>(sessionState);
@@ -12,16 +13,18 @@ export function HelloUserMessage() {
 
   return (
     <>
-      <img
-        src={avatarUrl}
-        alt="User Avatar"
-        style={{
-          borderRadius: "50%",
-          width: "64px",
-          height: "64px",
-          objectFit: "cover",
-        }}
-      />
+      {avatarUrl && (
+        <Image
+          src={avatarUrl}
+          alt="User Avatar"
+          width={64}
+          height={64}
+          style={{
+            borderRadius: "50%",
+            objectFit: "cover",
+          }}
+        />
+      )}
       <Heading fontSize="6xl">
         Hello {session?.user.user_metadata["name"]} !!
       </Heading>

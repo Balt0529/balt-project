@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { LogoutButton } from "@/components/Buttons/LogOutButton";
 import { useRouter } from "next/router";
 import supabase from "@/libs/supabase";
+import { User } from "@supabase/supabase-js";
 
 // 型定義
 type Post = {
@@ -46,7 +47,7 @@ export default function SaunaApp() {
   };
 
   const router = useRouter();
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<{ id: string; email: string; user_metadata?: { full_name?: string } } | null>(null);
   const [loading, setLoading] = useState(true);
   const [posts, setPosts] = useState<Post[]>([]);
   const [favorites, setFavorites] = useState<Favorite[]>([]);
@@ -128,7 +129,7 @@ export default function SaunaApp() {
 
 
   // ユーザー情報をバックエンドに同期
-  const syncUserWithBackend = async (user: any) => {
+  const syncUserWithBackend = async (user: { id: string; email: string; user_metadata?: { full_name?: string } }) => {
     try {
       const response = await fetch("http://127.0.0.1:8000/users", {
         method: "POST",
@@ -163,11 +164,27 @@ export default function SaunaApp() {
           router.push("/"); // 未ログインの場合はログインページへ
           return;
         }
-
+  
         const session = data?.session;
         if (session?.user) {
-          setUser(session.user);
-          await syncUserWithBackend(session.user); // バックエンドに同期
+          const user = session.user as User;
+  
+          // email が undefined の場合のフォールバックを設定
+          if (!user.email) {
+            throw new Error("ユーザーの email が見つかりません");
+          }
+  
+          setUser({
+            id: user.id,
+            email: user.email,
+            user_metadata: user.user_metadata,
+          });
+  
+          await syncUserWithBackend({
+            id: user.id,
+            email: user.email,
+            user_metadata: user.user_metadata,
+          }); // バックエンドに同期
         } else {
           router.push("/"); // セッションがない場合はログインページへ
         }
@@ -177,7 +194,7 @@ export default function SaunaApp() {
         setLoading(false);
       }
     };
-
+  
     fetchAndSyncUser();
   }, [router]);
 
@@ -206,7 +223,7 @@ export default function SaunaApp() {
           <Grid templateColumns="repeat(5, 1fr)">
             <GridItem colSpan={2}>
               <Link onClick={() => scrollTo("box1")} color="white" cursor="pointer" ml={10} mt={5}>
-                "ととのう"とは？
+                &quot;ととのう&quot;とは？
               </Link>
               <Link onClick={() => scrollTo("box2")} color="white" cursor="pointer" ml={6} mt={3}>
                 みんなのサ活
@@ -261,7 +278,7 @@ export default function SaunaApp() {
       <Box h="100vh" id="box1" bgImage="url('/Images/image.jpg')" bgSize="cover" display="flex" alignItems="center" justifyContent="center" textAlign="center" p={4}>
       <VStack>
           <Heading size="4xl" color="white" textShadow="0px 4px 8px rgba(14, 6, 6, 0.8)">
-            "ととのう"とは
+            &quot;ととのう&quot;とは
           </Heading>
           <Text fontSize="lg" color="black" maxW="650px">
             サウナで心と体がリフレッシュし、最高のリラクゼーション状態に達する瞬間。それが「ととのう」体験です。
@@ -322,7 +339,7 @@ export default function SaunaApp() {
           「ととのう」とは？
         </Heading>
         <Text fontSize="lg" px={4} maxW="800px" mx="auto" textAlign="center">
-          サウナと水風呂、外気浴を繰り返すことで、エンドルフィンやセロトニン、オキシトシンなどの"脳内麻薬"が分泌され、全身がリフレッシュされる感覚。
+          サウナと水風呂、外気浴を繰り返すことで、エンドルフィンやセロトニン、オキシトシンなどの&quot;脳内麻薬&quot;が分泌され、全身がリフレッシュされる感覚。
           頭がスーッと軽くなり、心も体も解放される瞬間です。
         </Text>
       </Box>

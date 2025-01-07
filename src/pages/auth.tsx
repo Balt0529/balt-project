@@ -1,4 +1,4 @@
-import { Center, HStack, VStack } from "@chakra-ui/react";
+import { Center, VStack } from "@chakra-ui/react";
 import Head from "next/head";
 import { HelloUserMessage } from "@/components/Messages/HelloUserMessage";
 import { LogoutButton } from "@/components/Buttons/LogOutButton";
