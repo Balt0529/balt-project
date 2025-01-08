@@ -16,6 +16,7 @@ const SaunaResult: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState<Sauna[]>([]);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
   useEffect(() => {
     if (!router.isReady) return;
@@ -28,7 +29,7 @@ const SaunaResult: React.FC = () => {
         if (keyword) params.append("keyword", keyword as string);
         if (prefecture) params.append("prefecture", prefecture as string);
 
-        const url = `http://127.0.0.1:8000/saunas?${params.toString()}`;
+        const url = `${API_BASE_URL}/saunas?${params.toString()}`;
         console.log(`Fetching results from URL: ${url}`);
 
         const response = await fetch(url);

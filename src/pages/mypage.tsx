@@ -53,11 +53,12 @@ export default function SaunaApp() {
   const [favorites, setFavorites] = useState<Favorite[]>([]);
   const [saunaNames, setSaunaNames] = useState<{ [key: string]: string }>({});
   const [showAll, setShowAll] = useState(false); // 全ての投稿を表示するかどうか
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const response = await fetch("http://127.0.0.1:8000/posts");
+        const response = await fetch(`${API_BASE_URL}/posts`);
         if (!response.ok) {
           throw new Error("投稿データの取得に失敗しました");
         }
@@ -85,7 +86,7 @@ export default function SaunaApp() {
   useEffect(() => {
     const fetchFavorites = async () => {
       try {
-        const response = await fetch("http://127.0.0.1:8000/favorites");
+        const response = await fetch(`${API_BASE_URL}/favorites`);
         if (!response.ok) {
           throw new Error("お気に入りデータの取得に失敗しました");
         }
@@ -106,7 +107,7 @@ export default function SaunaApp() {
         for (const favorite of favorites) {
           if (!saunaNameMap[favorite.sauna_id]) {
             const response = await fetch(
-              `http://127.0.0.1:8000/saunas/${favorite.sauna_id}`
+              `${API_BASE_URL}/saunas/${favorite.sauna_id}`
             );
             if (response.ok) {
               const data: Sauna = await response.json();
@@ -131,7 +132,7 @@ export default function SaunaApp() {
   // ユーザー情報をバックエンドに同期
   const syncUserWithBackend = async (user: { id: string; email: string; user_metadata?: { full_name?: string } }) => {
     try {
-      const response = await fetch("http://127.0.0.1:8000/users", {
+      const response = await fetch(`${API_BASE_URL}/users`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -201,7 +202,7 @@ export default function SaunaApp() {
 
   const handleDeleteFavorite = async (favoriteId: number) => {
     try {
-      const response = await fetch(`http://127.0.0.1:8000/favorites/${favoriteId}`, {
+      const response = await fetch(`${API_BASE_URL}/favorites/${favoriteId}`, {
         method: "DELETE",
       });
   

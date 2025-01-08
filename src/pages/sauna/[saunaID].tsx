@@ -40,6 +40,7 @@ const SaunaDetail: React.FC = () => {
   const [posts, setPosts] = useState<Post[]>([]);
   const googleMapsApiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
   const mapRef = useRef<HTMLDivElement>(null);
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
   
 
@@ -73,7 +74,7 @@ const SaunaDetail: React.FC = () => {
     }
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/favorites", {
+      const response = await fetch(`${API_BASE_URL}/favorites`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -105,7 +106,7 @@ const SaunaDetail: React.FC = () => {
       setLoading(true);
       setError(null);
       try {
-        const response = await fetch(`http://127.0.0.1:8000/saunas/${saunaID}`);
+        const response = await fetch(`${API_BASE_URL}/saunas/${saunaID}`);
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -125,7 +126,7 @@ const SaunaDetail: React.FC = () => {
   const fetchPosts = async () => {
     try {
       const response = await fetch(
-        `http://127.0.0.1:8000/posts?sauna_id=${saunaID}`
+        `${API_BASE_URL}/posts?sauna_id=${saunaID}`
       );
       if (!response.ok) {
         throw new Error(`投稿情報の取得に失敗しました: ${response.status}`);
@@ -165,7 +166,7 @@ const SaunaDetail: React.FC = () => {
     }
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/posts", {
+      const response = await fetch(`${API_BASE_URL}/posts`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -191,7 +192,7 @@ const SaunaDetail: React.FC = () => {
 
   const handleDelete = async (postId: number) => {
     try {
-      const response = await fetch(`http://127.0.0.1:8000/posts/${postId}`, {
+      const response = await fetch(`${API_BASE_URL}/posts/${postId}`, {
         method: "DELETE",
       });
 
