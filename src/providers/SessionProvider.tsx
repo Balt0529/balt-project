@@ -31,13 +31,13 @@ export const SessionProvider = ({ children }: SessionProviderProps) => {
       setSession(session);
       if (session) {
         if (pathname === "/") {
-          router.replace(`${process.env.NEXT_PUBLIC_BASE_URL}/mypage`); // ログイン済みの場合のリダイレクト
+          router.replace("/mypage"); // ログイン済みの場合のリダイレクト
         }
         setIsReady(true);
         return;
       }
       if (pathname !== "/") {
-        router.replace(`${process.env.NEXT_PUBLIC_BASE_URL}/`); // 未ログイン時はログインページにリダイレクト
+        router.replace("/"); // 未ログイン時はログインページにリダイレクト
       }
       setIsReady(true);
     };
