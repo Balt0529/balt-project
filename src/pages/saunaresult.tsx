@@ -29,7 +29,7 @@ const SaunaResult: React.FC = () => {
         if (keyword) params.append("keyword", keyword as string);
         if (prefecture) params.append("prefecture", prefecture as string);
 
-        const url = `${API_BASE_URL}saunas?${params.toString()}`;
+        const url = `${API_BASE_URL}/saunas?${params.toString()}`;
         console.log(`Fetching results from URL: ${url}`);
 
         const response = await fetch(url);
