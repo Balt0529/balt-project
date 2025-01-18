@@ -26,6 +26,11 @@ export default function Auth() {
     try {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
+        options: {
+          queryParams: {
+            prompt: "select_account", // アカウント選択画面を表示するパラメータ
+          },
+        },
       });
       if (error) {
         console.error("Googleログインエラー:", error);
