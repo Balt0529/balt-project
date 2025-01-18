@@ -85,20 +85,22 @@ export default function SaunaApp() {
 
   useEffect(() => {
     const fetchFavorites = async () => {
+      if (!user) return; // ユーザーがロードされていない場合はスキップ
+  
       try {
-        const response = await fetch(`${API_BASE_URL}/favorites`);
+        const response = await fetch(`${API_BASE_URL}/favorites?user_id=${user.id}`);
         if (!response.ok) {
           throw new Error("お気に入りデータの取得に失敗しました");
         }
         const data = await response.json();
-        setFavorites(data.favorites);
+        setFavorites(data.favorites); // ログイン中のユーザーのお気に入りのみ設定
       } catch (error) {
         console.error("お気に入り取得エラー:", error);
       }
     };
-
+  
     fetchFavorites();
-  }, []);
+  }, [user, API_BASE_URL]); // userが更新された場合のみ再実行
 
   useEffect(() => {
     const fetchSaunaNames = async () => {
