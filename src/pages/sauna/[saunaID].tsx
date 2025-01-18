@@ -124,25 +124,27 @@ const SaunaDetail: React.FC = () => {
   }, [saunaID]);
 
   const fetchPosts = async () => {
+    if (!userID || !saunaID) return; // ユーザーIDまたはサウナIDがない場合は中断
+  
     try {
       const response = await fetch(
-        `${API_BASE_URL}/posts?sauna_id=${saunaID}`
+        `${API_BASE_URL}/posts?sauna_id=${saunaID}&user_id=${userID}`
       );
       if (!response.ok) {
         throw new Error(`投稿情報の取得に失敗しました: ${response.status}`);
       }
       const data: Post[] = await response.json();
-      setPosts(data);
+      setPosts(data); // ログインユーザーの投稿のみセット
     } catch (err) {
       console.error(err);
     }
   };
 
   useEffect(() => {
-    if (saunaID) {
-      fetchPosts();
+    if (saunaID && userID) {
+      fetchPosts(); // saunaID と userID が利用可能になったら投稿を取得
     }
-  }, [saunaID]);
+  }, [saunaID, userID]);
 
   useEffect(() => {
     if (sauna && sauna.latitude && sauna.longitude && mapRef.current) {
