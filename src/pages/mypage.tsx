@@ -203,17 +203,21 @@ export default function SaunaApp() {
 
 
   const handleDeleteFavorite = async (favoriteId: number) => {
+    if (!user) return; // ログインしていない場合は中断
+  
     try {
-      const response = await fetch(`${API_BASE_URL}/favorites/${favoriteId}`, {
-        method: "DELETE",
-      });
+      const response = await fetch(
+        `${API_BASE_URL}/favorites/${favoriteId}?user_id=${user.id}`, // クエリにuser_idを追加
+        {
+          method: "DELETE",
+        }
+      );
   
       if (!response.ok) {
         throw new Error(`お気に入り削除に失敗しました: ${response.status}`);
       }
   
-      // フロントエンドでお気に入りリストを更新
-      setFavorites((prev) => prev.filter((favorite) => favorite.id !== favoriteId));
+      setFavorites((prev) => prev.filter((favorite) => favorite.id !== favoriteId)); // フロントエンドの状態を更新
       alert("お気に入りを削除しました！");
     } catch (error) {
       console.error("お気に入り削除エラー:", error);
